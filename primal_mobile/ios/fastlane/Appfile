@@ -1,0 +1,4 @@
+# Replace these placeholders in CI or locally when running fastlane
+app_identifier("uk.co.primalbalance.app")
+apple_id("REPLACE_WITH_APPLE_ID")
+team_id("REPLACE_WITH_TEAM_ID")

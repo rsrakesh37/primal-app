@@ -1,0 +1,38 @@
+name: iOS IPA Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter pub get
+        working-directory: primal_mobile
+        run: flutter pub get
+
+      - name: Install fastlane
+        run: gem install fastlane
+
+      - name: Build IPA with fastlane
+        working-directory: primal_mobile
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          IOS_EXPORT_METHOD: ${{ secrets.IOS_EXPORT_METHOD }} # ad-hoc, enterprise, or app-store
+        run: fastlane ios build_ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: primal_mobile-ipa
+          path: primal_mobile/build/ios/*.ipa
