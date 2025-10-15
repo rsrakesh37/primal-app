@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "uk.co.primalbalance.app"
+    namespace = "uk.co.primalbalance.yoga"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,8 +20,8 @@ android {
     }
 
     defaultConfig {
-        // Application ID for primal-balance.co.uk
-        applicationId = "uk.co.primalbalance.app"
+        // Application ID for primal-balance.co.uk yoga app
+        applicationId = "uk.co.primalbalance.yoga"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
