@@ -1,13 +1,16 @@
 RewriteEngine On
 
+# Set the base path for subfolder deployment
+RewriteBase /app/
+
 # Handle CORS preflight requests
 RewriteCond %{REQUEST_METHOD} OPTIONS
 RewriteRule ^(.*)$ $1 [R=200,L]
 
-# Route all requests to index.php
+# Route all requests to index.php within the app subfolder
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php [QSA,L]
+RewriteRule ^(.*)$ /app/index.php [QSA,L]
 
 # Security headers
 Header always set X-Content-Type-Options nosniff
