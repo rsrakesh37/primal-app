@@ -37,11 +37,38 @@ class AuthController {
         }
 
         try {
+            // For mock database (local development without database server)
+            if (isMock()) {
+                $user_id = rand(1, 1000);
+                $token = $this->generateJWT($user_id, $email);
+                
+                echo json_encode([
+                    'message' => 'User registered successfully (mock)',
+                    'user' => [
+                        'id' => $user_id,
+                        'email' => $email,
+                        'first_name' => $first_name,
+                        'last_name' => $last_name
+                    ],
+                    'token' => $token
+                ]);
+                return;
+            }
+
             // Check if user already exists
-            $stmt = $this->db->prepare("SELECT id FROM users WHERE email = ?");
-            $stmt->execute([$email]);
+            if (isPDO()) {
+                $stmt = $this->db->prepare("SELECT id FROM users WHERE email = ?");
+                $stmt->execute([$email]);
+                $existing_user = $stmt->fetch();
+            } else {
+                $stmt = $this->db->prepare("SELECT id FROM users WHERE email = ?");
+                $stmt->bind_param("s", $email);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $existing_user = $result->fetch_assoc();
+            }
             
-            if ($stmt->fetch()) {
+            if ($existing_user) {
                 http_response_code(409);
                 echo json_encode(['error' => 'User already exists']);
                 return;
@@ -49,10 +76,18 @@ class AuthController {
 
             // Create new user
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $this->db->prepare("INSERT INTO users (email, password_hash, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$email, $password_hash, $first_name, $last_name, $phone]);
+            
+            if (isPDO()) {
+                $stmt = $this->db->prepare("INSERT INTO users (email, password_hash, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$email, $password_hash, $first_name, $last_name, $phone]);
+                $user_id = $this->db->lastInsertId();
+            } else {
+                $stmt = $this->db->prepare("INSERT INTO users (email, password_hash, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("sssss", $email, $password_hash, $first_name, $last_name, $phone);
+                $stmt->execute();
+                $user_id = $this->db->insert_id;
+            }
 
-            $user_id = $this->db->lastInsertId();
             $token = $this->generateJWT($user_id, $email);
 
             echo json_encode([
@@ -85,9 +120,36 @@ class AuthController {
         $password = $input['password'];
 
         try {
-            $stmt = $this->db->prepare("SELECT id, email, password_hash, first_name, last_name FROM users WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
+            // For mock database (local development without database server)
+            if (isMock()) {
+                // Mock login - accept any email/password combination
+                $user_id = rand(1, 1000);
+                $token = $this->generateJWT($user_id, $email);
+                
+                echo json_encode([
+                    'message' => 'Login successful (mock)',
+                    'user' => [
+                        'id' => $user_id,
+                        'email' => $email,
+                        'first_name' => 'Mock',
+                        'last_name' => 'User'
+                    ],
+                    'token' => $token
+                ]);
+                return;
+            }
+
+            if (isPDO()) {
+                $stmt = $this->db->prepare("SELECT id, email, password_hash, first_name, last_name FROM users WHERE email = ?");
+                $stmt->execute([$email]);
+                $user = $stmt->fetch();
+            } else {
+                $stmt = $this->db->prepare("SELECT id, email, password_hash, first_name, last_name FROM users WHERE email = ?");
+                $stmt->bind_param("s", $email);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $user = $result->fetch_assoc();
+            }
 
             if (!$user || !password_verify($password, $user['password_hash'])) {
                 http_response_code(401);

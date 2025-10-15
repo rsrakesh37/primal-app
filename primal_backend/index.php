@@ -20,8 +20,9 @@ $request_uri = $_SERVER['REQUEST_URI'];
 $path = parse_url($request_uri, PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Remove base path if needed
+// Remove base path if needed (handle subfolder deployment)
 $path = str_replace('/primal_backend', '', $path);
+$path = str_replace('/app', '', $path);
 
 try {
     switch ($path) {

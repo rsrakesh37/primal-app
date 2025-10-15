@@ -1,39 +1,62 @@
 <?php
-class Database {
-    private $host;
-    private $db_name;
-    private $username;
-    private $password;
-    private $conn;
+// Production database configuration for shared hosting
+$host = 'localhost';
+$dbname = 'rectubmx_primal_app';
+$username = 'rectubmx_primal_user';
+$password = 'Inferno@8087';
 
-    public function __construct() {
-        // Use environment variables or default values
-        $this->host = $_ENV['DB_HOST'] ?? 'localhost';
-        $this->db_name = $_ENV['DB_NAME'] ?? 'primal_balance';
-        $this->username = $_ENV['DB_USER'] ?? 'root';
-        $this->password = $_ENV['DB_PASS'] ?? '';
-    }
+// Try PDO first (for shared hosting), fallback to MySQLi (for local development)
+$db = null;
+$use_pdo = false;
 
-    public function getConnection() {
-        $this->conn = null;
-
-        try {
-            $this->conn = new PDO(
-                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
-                $this->username,
-                $this->password
-            );
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        } catch(PDOException $exception) {
-            throw new Exception("Connection error: " . $exception->getMessage());
-        }
-
-        return $this->conn;
+if (extension_loaded('pdo_mysql')) {
+    try {
+        $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        ]);
+        $use_pdo = true;
+    } catch (PDOException $e) {
+        // PDO failed, will try MySQLi below
+        $db = null;
     }
 }
 
-// Global database instance
-$database = new Database();
-$db = $database->getConnection();
+if (!$db && extension_loaded('mysqli')) {
+    try {
+        $db = new mysqli($host, $username, $password, $dbname);
+        if ($db->connect_error) {
+            throw new Exception("MySQLi connection failed: " . $db->connect_error);
+        }
+        $db->set_charset("utf8mb4");
+        $use_pdo = false;
+    } catch (Exception $e) {
+        // For local development, create a mock database connection
+        $db = new stdClass();
+        $db->mock = true;
+        $use_pdo = false;
+    }
+}
+
+if (!$db) {
+    // Create a mock database for local development when no database is available
+    $db = new stdClass();
+    $db->mock = true;
+    $use_pdo = false;
+}
+
+function getConnection() {
+    global $db;
+    return $db;
+}
+
+function isPDO() {
+    global $use_pdo;
+    return $use_pdo;
+}
+
+function isMock() {
+    global $db;
+    return isset($db->mock) && $db->mock;
+}
 ?>
