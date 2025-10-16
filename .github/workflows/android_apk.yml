@@ -14,7 +14,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -28,16 +29,25 @@ jobs:
           channel: stable
           flutter-version: '3.24.0'
 
+      - name: Flutter doctor
+        working-directory: primal_mobile
+        run: flutter doctor -v
+
+      - name: Flutter clean
+        working-directory: primal_mobile
+        run: flutter clean
+
       - name: Flutter pub get
         working-directory: primal_mobile
         run: flutter pub get
 
       - name: Build APK
         working-directory: primal_mobile
-        run: flutter build apk --release
+        run: flutter build apk --release --verbose
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: primal_mobile-apk
           path: primal_mobile/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
