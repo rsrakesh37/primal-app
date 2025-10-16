@@ -1,0 +1,24 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build signed IPA for iOS"
+  lane :build_ipa do
+    # App Store Connect API key is expected via environment variables in CI
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_ISSUER_ID'],
+      key_content: ENV['APP_STORE_CONNECT_PRIVATE_KEY'],
+      is_key_content_base64: true
+    )
+
+    build_app(
+      workspace: "ios/Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: (ENV['IOS_EXPORT_METHOD'] || 'ad-hoc'),
+      output_directory: "build/ios",
+      output_name: "PrimalMobile",
+      include_bitcode: false,
+      api_key: api_key
+    )
+  end
+end

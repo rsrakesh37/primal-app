@@ -1,0 +1,12 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build release APK"
+  lane :build_apk do
+    gradle(
+      task: "assembleRelease",
+      project_dir: "android"
+    )
+    UI.message("APK built at android/app/build/outputs/apk/release/")
+  end
+end
