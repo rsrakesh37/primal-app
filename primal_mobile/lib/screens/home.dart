@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
       title: Text('Strength Balance', style: TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text('4 weeks · Beginner'),
       trailing: ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFFD54F), onPrimary: Colors.black),
+        style: ElevatedButton.styleFrom(foregroundColor: Colors.black, backgroundColor: Color(0xFFFFD54F)),
         child: Text('View'),
         onPressed: () {},
       ),
@@ -17,6 +17,8 @@ import 'package:flutter/material.dart';
 }
 
     class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
       @override
       Widget build(BuildContext context) {
         return Scaffold(
@@ -38,7 +40,7 @@ import 'package:flutter/material.dart';
             title: Text('Start 7-day Free Trial', style: TextStyle(color: Color(0xFFFFD54F), fontWeight: FontWeight.bold)),
             subtitle: Text('Unlock all programs and live classes'),
             trailing: ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFFD54F), onPrimary: Colors.black),
+              style: ElevatedButton.styleFrom(foregroundColor: Colors.black, backgroundColor: Color(0xFFFFD54F)),
               onPressed: () {},
               child: Text('Start'),
             ),
@@ -59,9 +61,7 @@ import 'package:flutter/material.dart';
       ],
     ),
   );
-})
-,
-          bottomNavigationBar: null,
+}),
         );
       }
     }
