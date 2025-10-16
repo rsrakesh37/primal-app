@@ -12,6 +12,8 @@ void main() {
 }
 
 class PrimalBalanceApp extends StatelessWidget {
+  const PrimalBalanceApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     final Color gold = const Color(0xFFFFD54F);

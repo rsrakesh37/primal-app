@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-    class BookingScreen extends StatelessWidget {
-      @override
+class BookingScreen extends StatelessWidget {
+  const BookingScreen({super.key});
+  
+  @override
       Widget build(BuildContext context) {
         return Scaffold(
           appBar: AppBar(
@@ -26,7 +28,7 @@ import 'package:flutter/material.dart';
               title: Text('Sunrise Flow - Strength'),
               subtitle: Text('Tomorrow · 06:30 AM'),
               trailing: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFFD54F), onPrimary: Colors.black),
+                style: ElevatedButton.styleFrom(foregroundColor: Colors.black, backgroundColor: Color(0xFFFFD54F)),
                 child: Text('Book'),
                 onPressed: () {},
               ),
